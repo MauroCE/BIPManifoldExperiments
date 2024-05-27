@@ -30,7 +30,7 @@ def log_post(theta, sigma):
 
 def grad_neg_log_post(theta, sigma):
     """Gradient of the negative log posterior for theta."""
-    return theta + 0.5*constraint(theta)*grad_forward(theta)/sigma**2
+    return theta + constraint(theta)*grad_forward(theta)/sigma**2
 
 
 def forward_extended(xi, sigma):

@@ -56,5 +56,6 @@ def hmc(x0, L, step, N, log_dens, gnld, rng=None):
         esjd += ap*np.linalg.norm(x0 - xL)**2
         if np.log(rng.uniform(low=0.0, high=1.0)) <= log_ar:
             acceptances[i] = 1
+            x0 = xL
         samples.append(x0)
-    return np.vstack(samples), acceptances, esjd, time.time() - start_time
+    return np.vstack(samples), acceptances.mean(), esjd, time.time() - start_time
