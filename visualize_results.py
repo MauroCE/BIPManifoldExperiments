@@ -10,6 +10,9 @@ with open("results/experiment1234.pkl", "rb") as file:
 with open("results/experiment1234_hmc_prop_parallel.pkl", "rb") as file:
     results_prop = pickle.load(file)
 
+with open("results/experiment1234_thug_prop_parallel_full.pkl", "rb") as file:
+    results_prop_thug = pickle.load(file)
+
 sigmas = np.logspace(start=0.0, stop=-6.0, num=7, endpoint=True, base=10.0, dtype=np.float64)
 cs = ['dodgerblue', 'lightcoral', 'lawngreen']
 mecs = ['navy', 'brown', 'forestgreen']
