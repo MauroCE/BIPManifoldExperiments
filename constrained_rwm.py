@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import time
 
 
 def qr_project(v, J):
@@ -88,8 +89,9 @@ def project_zappa_manifold(manifold, z, Q, tol=1.48e-08, maxiter=50):
     return a, 1, i
 
 
-def constrained_rwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
+def crwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
     """C-RWM using RATTLE."""
+    start_time = time.time()
     assert isinstance(B, int), "Number of integration steps B must be an integer."
     assert isinstance(n, int), "Number of samples n must be an integer."
     assert len(x0) == manifold.n, "Initial point has wrong dimension."
@@ -141,4 +143,4 @@ def constrained_rwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
             # Reject
             samples[i, :] = x
             accepted[i - 1] = 0
-    return samples, n_evals, accepted, esjd
+    return samples, n_evals, accepted.mean(), esjd, time.time() - start_time

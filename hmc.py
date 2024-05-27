@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 
 def leapfrog(x, v, gnld, step, n_leapfrogs):
@@ -39,6 +40,7 @@ def leapfrog(x, v, gnld, step, n_leapfrogs):
 
 def hmc(x0, L, step, N, log_dens, gnld, rng=None):
     """Hamiltonian Monte Carlo with identity mass matrix."""
+    start_time = time.time()
     rng = np.random.default_rng(seed=np.random.randint(low=0, high=10000)) if rng is None else rng
     samples = []
     acceptances = np.zeros(N)
@@ -55,4 +57,4 @@ def hmc(x0, L, step, N, log_dens, gnld, rng=None):
         if np.log(rng.uniform(low=0.0, high=1.0)) <= log_ar:
             acceptances[i] = 1
         samples.append(x0)
-    return np.vstack(samples), acceptances, esjd
+    return np.vstack(samples), acceptances, esjd, time.time() - start_time
