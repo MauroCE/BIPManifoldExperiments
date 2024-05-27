@@ -8,7 +8,7 @@ def thug(x0, T, B, N, alpha, q, logpi, grad_log_pi):
     """
     # Grab dimension, initialize storage for samples & acceptances
     samples, acceptances = x0, np.zeros(N)
-    esjd = 0.0
+    esjd = 0.0  # rao-blackwellised
     for i in range(N):
         v0s = q.rvs()                    # Draw velocity spherically
         g = grad_log_pi(x0)              # Compute gradient at x0
