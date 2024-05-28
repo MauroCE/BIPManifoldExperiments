@@ -6,3 +6,7 @@ Experiments on a simple 2D Bayesian Inverse Problem using Approximate Manifold S
 The plot below shows the same quantities but for a grid of integration steps and step sizes. The first row corresponds to `delta=0.05` and the second row to `delta=0.1`. The columns correspond to `B=10,20,30` respectively.
 
 ![minimum ESS grid](images/min_ess_vs_noise_scale_grid.png)
+
+Finally, we show also the raw minESS since sometimes very low minESS values can be misleading when presented in `minESS/runtime` form.
+
+![minimum ESS raw](images/raw_min_ess_main.png)
