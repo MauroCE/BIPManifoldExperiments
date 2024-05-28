@@ -59,36 +59,21 @@ plt.tight_layout()
 plt.savefig("images/min_ess_vs_noise_scale_grid.png", dpi=300)
 plt.show()
 
-
-# # B=20, step=0.1
-# for ix, alg in enumerate(['thug', 'hmc', 'crwm']):
-#     ax[0].plot(sigmas, results01['cc-az'][alg],
-#                marker='o', lw=2.5, ms=9.0, c=cs[ix], mec=mecs[ix], label=alg.upper(), mew=2.0)
-# ax[0].plot(sigmas[:4], results01['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
-#            label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
-# ax[0].set_title(r"$\mathregular{B=20, \delta=0.1}$", fontsize=20)
-# # B=20, step=0.05
-# for ix, alg in enumerate(['thug', 'hmc', 'crwm']):
-#     ax[1].plot(sigmas, results005['cc-az'][alg],
-#                marker='o', lw=2.5, ms=9.0, c=cs[ix], mec=mecs[ix], label=alg.upper(), mew=2.0)
-# ax[1].plot(sigmas[:4], results005['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
-#            label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
-# ax[1].set_title(r"$\mathregular{B=20, \delta=0.05}$", fontsize=20)
-# # B=30, step=0.1
-# for ix, alg in enumerate(['thug', 'hmc', 'crwm']):
-#     ax[2].plot(sigmas, results30['cc-az'][alg],
-#                marker='o', lw=2.5, ms=9.0, c=cs[ix], mec=mecs[ix], label=alg.upper(), mew=2.0)
-# ax[2].plot(sigmas[:4], results30['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
-#            label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
-# ax[2].set_title(r"$\mathregular{B=30, \delta=0.1}$", fontsize=20)
-# # prettify
-# ax[0].set_ylabel("minESS/s", fontsize=16)
-# for i in range(3):
-#     ax[i].set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
-#     ax[i].set_xscale('log')
-#     ax[i].set_yscale('log')
-#     ax[i].grid(True, color='gainsboro')
-# plt.legend()
-# plt.grid(True, color='gainsboro')
-# # plt.savefig("images/min_ess_vs_noise_scale.png", dpi=300)
-# plt.show()
+# Generate a single plot for B=20 and step=0.1 which will be used in the main part of the thesis
+rc('font', **{'family': 'STIXGeneral'})
+fig, ax = plt.subplots()
+for ai, alg in enumerate(algs):
+    ax.plot(sigmas, results['20'][1]['cc-az'][alg], marker='o', lw=2.5, ms=9.0, c=cs[ai], mec=mecs[ai],
+            label=alg.upper(), mew=2.0)
+ax.plot(sigmas[:4], results['20'][1]['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
+        label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.grid(True, color='gainsboro')
+# Prettify
+ax.set_ylabel("minESS/s", fontsize=16)
+ax.set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
+plt.legend()
+plt.tight_layout()
+plt.savefig("images/min_ess_vs_noise_scale_main.png", dpi=300)
+plt.show()
