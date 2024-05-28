@@ -9,17 +9,17 @@ def qr_project(v, J):
     return Q @ (Q.T @ v)
 
 
-def constrained_rwm_step(x, v, tol, maxiter, Jx, manifold):
+def constrained_rwm_step(x, v, tol, maxiter, Jx, jac, constraint):
     """Used for both forward and backward. See Manifold-Lifting paper."""
     # Project momentum
     v_projected = v - qr_project(v, Jx)
     # Unconstrained position step
     x_unconstr = x + v_projected
     # Position Projection
-    a, flag, n_grad = project_zappa_manifold(manifold, x_unconstr, Jx.T, tol, maxiter)
+    a, flag, n_grad = project_zappa_manifold(constraint, jac, x_unconstr, Jx.T, tol, maxiter)
     y = x_unconstr - Jx.T @ a
     try:
-        Jy = manifold.Q(y).T
+        Jy = jac(y)
     except ValueError as e:
         print("Jacobian computation at projected point failed. ", e)
         return x, v, Jx, 0, n_grad + 1
@@ -31,14 +31,14 @@ def constrained_rwm_step(x, v, tol, maxiter, Jx, manifold):
     return y, v_projected_endposition, Jy, flag, n_grad + 1
 
 
-def constrained_leapfrog(x0, v0, J0, B, tol, rev_tol, maxiter, manifold):
+def constrained_leapfrog(x0, v0, J0, B, tol, rev_tol, maxiter, jac, constraint):
     """Constrained Leapfrog/RATTLE."""
     successful = True
     n_jacobian_evaluations = 0
     x, v, J = x0, v0, J0
     for _ in range(B):
-        xf, vf, Jf, converged_fw, n_fw = constrained_rwm_step(x, v, tol, maxiter, J, manifold)
-        xr, vr, Jr, converged_bw, n_bw = constrained_rwm_step(xf, -vf, tol, maxiter, Jf, manifold)
+        xf, vf, Jf, converged_fw, n_fw = constrained_rwm_step(x, v, tol, maxiter, J, jac, constraint)
+        xr, vr, Jr, converged_bw, n_bw = constrained_rwm_step(xf, -vf, tol, maxiter, Jf, jac, constraint)
         n_jacobian_evaluations += (n_fw + n_bw)  # +2 due to the line Jy = manifold.Q(y).T
         if (not converged_fw) or (not converged_bw) or (np.linalg.norm(xr - x) >= rev_tol):
             successful = False
@@ -50,7 +50,7 @@ def constrained_leapfrog(x0, v0, J0, B, tol, rev_tol, maxiter, manifold):
     return x, v, J, successful, n_jacobian_evaluations
 
 
-def project_zappa_manifold(manifold, z, Q, tol=1.48e-08, maxiter=50):
+def project_zappa_manifold(constraint, jac, z, Q, tol=1.48e-08, maxiter=50):
     """
     This version is the version of Miranda & Zappa. It returns i, the number of iterations
     i.e. the number of gradient evaluations used.
@@ -59,13 +59,13 @@ def project_zappa_manifold(manifold, z, Q, tol=1.48e-08, maxiter=50):
 
     # Compute the constrained at z - Q@a. If it fails due to overflow error, return a rejection altogether.
     try:
-        projected_value = manifold.q(z - Q @ a)
+        projected_value = constraint(z - Q @ a)
     except ValueError:
         return a, 0, i
     # While loop
     while sp.linalg.norm(projected_value) >= tol:
         try:
-            Jproj = manifold.Q(z - Q @ a).T
+            Jproj = jac(z - Q @ a)
         except ValueError as e:
             print("Jproj failed. ", e)
             return np.zeros(Q.shape[1]), 0, i
@@ -80,7 +80,7 @@ def project_zappa_manifold(manifold, z, Q, tol=1.48e-08, maxiter=50):
                 return np.zeros(Q.shape[1]), 0, i
             # If we are not at maxiter iteration, compute new projected value
             try:
-                projected_value = manifold.q(z - Q @ a)
+                projected_value = constraint(z - Q @ a)
             except ValueError:
                 return np.zeros(Q.shape[1]), 0, i
         else:
@@ -89,16 +89,16 @@ def project_zappa_manifold(manifold, z, Q, tol=1.48e-08, maxiter=50):
     return a, 1, i
 
 
-def crwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
+def crwm(x0, log_dens, jac, constraint, n, T, B, tol, rev_tol, maxiter=50, rng=None):
     """C-RWM using RATTLE."""
     start_time = time.time()
     assert isinstance(B, int), "Number of integration steps B must be an integer."
     assert isinstance(n, int), "Number of samples n must be an integer."
-    assert len(x0) == manifold.n, "Initial point has wrong dimension."
     rng = np.random.default_rng(seed=np.random.randint(low=0, high=10000)) if rng is None else rng
     # Settings
     step = T / B
-    d, m = manifold.get_dimension(), manifold.get_codimension()
+    d = len(x0)
+    m = len(constraint(x0)) if isinstance(constraint(x0), np.ndarray) else 1
 
     # Initial point on the manifold
     x = x0
@@ -106,7 +106,6 @@ def crwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
     # Storage
     samples = np.zeros((n, d + m))  # Store n samples on the manifold
     samples[0, :] = x
-    n_evals = {'jacobian': 0, 'density': 0}
     accepted = np.zeros(n)
     esjd = 0.0                          # rao-blackwellised expected square jump distance
 
@@ -114,18 +113,17 @@ def crwm(x0, manifold, n, T, B, tol, rev_tol, maxiter=50, rng=None):
     logu = np.log(rng.uniform(size=n))
 
     # Compute jacobian & density value
-    Jx = manifold.Q(x).T
-    logp_x = manifold.log_post(x)
-    n_evals['jacobian'] += 1
-    n_evals['density'] += 1
+    Jx = jac(x)
+    logp_x = log_dens(x)
+    n_evals = {'jacobian': 1, 'density': 1}
 
     for i in range(n):
         v = step * rng.normal(size=(m + d))  # Sample in the ambient space.
-        xp, vp, Jp, LEAPFROG_SUCCESSFUL, n_jac_evals = constrained_leapfrog(x, v, Jx, B, tol=tol, rev_tol=rev_tol,
-                                                                            maxiter=maxiter, manifold=manifold)
+        xp, vp, Jp, LEAPFROG_SUCCESSFUL, n_jac_evals = constrained_leapfrog(
+            x, v, Jx, B, tol=tol, rev_tol=rev_tol, maxiter=maxiter, jac=jac, constraint=constraint)
         n_evals['jacobian'] += n_jac_evals
         if LEAPFROG_SUCCESSFUL:
-            logp_p = manifold.log_post(xp)
+            logp_p = log_dens(xp)
             n_evals['density'] += 1
             log_ar = logp_p - logp_x - (vp @ vp) / 2 + (v @ v) / 2
             ap = np.exp(np.clip(log_ar, a_min=None, a_max=0.0))
