@@ -77,3 +77,22 @@ plt.legend()
 plt.tight_layout()
 plt.savefig("images/min_ess_vs_noise_scale_main.png", dpi=300)
 plt.show()
+
+# Generate raw minESS plot for main part of the thesis
+rc('font', **{'family': 'STIXGeneral'})
+fig, ax = plt.subplots()
+for ai, alg in enumerate(algs):
+    ax.plot(sigmas, results['20'][1]['ess-az'][alg], marker='o', lw=2.5, ms=9.0, c=cs[ai], mec=mecs[ai],
+            label=alg.upper(), mew=2.0)
+ax.plot(sigmas[:4], results['20'][1]['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
+        label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.grid(True, color='gainsboro')
+# Prettify
+ax.set_ylabel("minESS", fontsize=16)
+ax.set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
+plt.legend()
+plt.tight_layout()
+plt.savefig("images/raw_min_ess_main.png", dpi=300)
+plt.show()
