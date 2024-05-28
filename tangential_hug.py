@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 
-def thug(x0, step_size, B, N, alpha, logpi, grad_f, rng=None):
+def thug(x0, step_size, B, N, alpha, log_dens, grad_f, rng=None):
     """
     Tangential Hug. Notice that it doesn't matter whether we use the gradient of pi or
     grad log pi to tilt the velocity.
@@ -32,7 +32,7 @@ def thug(x0, step_size, B, N, alpha, logpi, grad_f, rng=None):
         g = g / np.linalg.norm(g)
         v = v + (alpha / (1 - alpha)) * g * (g @ v)
         # In the acceptance ratio must use spherical velocities, hence v0s and the unsqueezed v
-        log_ar = logpi(x) - 0.5*(v@v) - logpi(x0) + 0.5*(v0s@v0s)
+        log_ar = log_dens(x) - 0.5*(v@v) - log_dens(x0) + 0.5*(v0s@v0s)
         ap = np.exp(np.clip(log_ar, a_min=None, a_max=0.0))  # acceptance probability
         esjd += ap*np.linalg.norm(x0 - x)**2
         if logu <= log_ar:

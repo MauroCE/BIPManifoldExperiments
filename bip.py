@@ -25,12 +25,15 @@ def log_prior(theta):
 
 def log_post(theta, sigma):
     """Log posterior for theta given a noise scale sigma."""
-    return log_prior(theta) - 0.5*(constraint(theta)**2)/(sigma**2)
+    return log_prior(theta) - 0.5*(constraint(theta)**2)/(sigma**2) + np.log(sigma)
 
 
 def grad_neg_log_post(theta, sigma):
     """Gradient of the negative log posterior for theta."""
     return theta + constraint(theta)*grad_forward(theta)/sigma**2
+
+
+# ---------- EXTENDED FUNCTION -----------
 
 
 def forward_extended(xi, sigma):
@@ -43,20 +46,19 @@ def constraint_extended(xi, sigma, y=1.0):
     return forward_extended(xi, sigma) - y
 
 
-def grad_forward_extended(xi):
-    """Gradient of the extended forward function."""
-    return np.array([12*xi[0]**3 - 6.0*xi[0], 2*xi[1], xi[2]])
+def jac_forward_extended(xi, noise_scale):
+    """Returns the jacobian of the extended forward function, this is a simple row vector and indeed
+    the transpose of the gradient of the extended forward function."""
+    return np.array([12*xi[0]**3 - 6.0*xi[0], 2*xi[1], noise_scale]).reshape(1, -1)
 
 
-def log_prior_extended(xi):
-    """Log prior for xi is a standard normal."""
-    return -0.5*np.sum(xi**2)
+def log_post_extended(xi,  noise_scale):
+    """log posterior for c-rwm"""
+    jac = jac_forward_extended(xi, noise_scale)
+    return - xi[:2]@xi[:2]/2 - xi[-1]**2/2 - np.log(jac@jac.T + noise_scale**2)[0, 0]/2
 
 
-def log_post_extended(xi):
-    """Log posterior for xi given a noise scale sigma."""
-    return log_prior_extended(xi) - np.log(np.linalg.norm(grad_forward_extended(xi)))
-
+# --------- FINDING POINTS ON MANIFOLDS ---------
 
 def find_point_on_theta_manifold(maxiter=1000, tol=1e-12, rng=None, y=1.0):
     """Finds a point on the theta manifold."""

@@ -97,7 +97,7 @@ def crwm(x0, log_dens, jac, constraint, n, T, B, tol, rev_tol, maxiter=50, rng=N
     rng = np.random.default_rng(seed=np.random.randint(low=0, high=10000)) if rng is None else rng
     # Settings
     step = T / B
-    d = len(x0)
+    d = len(x0) - 1
     m = len(constraint(x0)) if isinstance(constraint(x0), np.ndarray) else 1
 
     # Initial point on the manifold
