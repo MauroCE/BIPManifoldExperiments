@@ -10,3 +10,7 @@ The plot below shows the same quantities but for a grid of integration steps and
 Finally, we show also the raw minESS since sometimes very low minESS values can be misleading when presented in `minESS/runtime` form.
 
 ![minimum ESS raw](images/raw_min_ess_main.png)
+
+HMC and THUG samples for `sigma=1.0`.
+
+![samples sigma](/images/thug_hmc_samples_sigma_1dot0.png)

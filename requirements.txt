@@ -151,3 +151,8 @@ xz=5.4.6=h80987f9_1
 yarl=1.9.3=py311h80987f9_0
 zlib=1.2.13=h18a0788_1
 zstd=1.5.5=hd90d995_2
+
+numpy~=1.23.5
+scipy~=1.11.4
+matplotlib~=3.8.4
+arviz~=0.17.1
