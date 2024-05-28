@@ -13,7 +13,7 @@ if __name__ == "__main__":
     B = 20
     N = 2500
     seed = 1234
-    sigma = 1.0
+    sigma = 0.001
     rng = np.random.default_rng(seed=seed)
 
     # Initial point
@@ -42,13 +42,14 @@ if __name__ == "__main__":
     levels = sigma * np.arange(-n_std, n_std+1)
     contours = ax.contourf(XX, YY, ZZ, levels=levels, cmap='viridis')
     ax.contour(XX, YY, ZZ, levels=[0.0], colors='black')
-    ax.scatter(*s_thug.T, s=4, color='dodgerblue', ec='navy')
-    ax.scatter(*s_hmc.T, s=4, color='lightcoral', ec='brown')
+    ax.scatter(*s_thug.T, s=4, color='dodgerblue', ec='navy', label='THUG')
+    ax.scatter(*s_hmc.T, s=4, color='lightcoral', ec='brown', label='HMC')
     ax.set_aspect('equal')
     ax.set_xlabel(r"$\mathregular{\theta_0}$", fontsize=15)
     ax.set_ylabel(r"$\mathregular{\theta_1}$", fontsize=15)
     plt.colorbar(contours, label="Standard deviations from " + r"$\mathregular{C(\theta) = F(\theta) - y = 0}$")
     plt.tight_layout()
+    plt.legend()
     plt.savefig("images/thug_hmc_samples_sigma_{}.png".format(
         str(sigma).replace('.', 'dot')), dpi=300)
     plt.show()
