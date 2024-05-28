@@ -13,4 +13,4 @@ Finally, we show also the raw minESS since sometimes very low minESS values can 
 
 HMC and THUG samples for `sigma=1.0`.
 
-![samples sigma](/images/thug_hmc_samples_sigma_1dot0.png)
+![samples sigma](/images/thug_hmc_samples_sigma_0dot1.png)
