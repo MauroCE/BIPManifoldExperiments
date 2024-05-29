@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print("THUG+SNUG_08 ESJD: ", esjd_ts08)
     # THUG + RWM, PROB(THUG) = 0.5
     s_tr05, ap_tr05, esjd_tr05, runtime_tr05 = thug_and_rwm(
-        x0=theta, step_thug=step, step_rwm=step, p_thug=0.5, B=B, N=N, alpha=0.0,
+        x0=theta, step_thug=step, step_rwm=0.5*step, p_thug=0.5, B=B, N=N, alpha=0.0,
         log_dens=lambda t: log_post(t, sigma=sigma), grad_f=grad_forward, rng=rng)
     ess_tr05 = min(tfp.mcmc.effective_sample_size(s_tr05))
     print("THUG+RWM ESJD: ", esjd_tr05)

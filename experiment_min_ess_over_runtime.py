@@ -51,8 +51,8 @@ def run_crwm(s_ix, c_ix, noise_scale, xi_list, step_size, n_int, n_samples, gene
 if __name__ == "__main__":
     # Settings
     N = 2500      # Number of samples
-    step = 0.1    # Step size
-    B = 10        # Number of integration steps
+    step = 0.5    # Step size
+    B = 30        # Number of integration steps
     tau = B*step  # Total integration time
     sigmas = np.logspace(start=0.0, stop=-5.0, num=6, endpoint=True, base=10.0, dtype=np.float64)  # noise scales
     ns = len(sigmas)

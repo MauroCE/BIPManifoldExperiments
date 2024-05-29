@@ -22,6 +22,9 @@ with open("results/experiment1234_final_T30_step005.pkl", "rb") as file:
 with open("results/experiment1234_final_T30_step01.pkl", "rb") as file:
     results30_01 = pickle.load(file)
 
+with open("results/experiment1234_final_T30_step05.pkl", "rb") as file:
+    results30_05 = pickle.load(file)
+
 results = {
     '10': [results10_005, results10_01],
     '20': [results20_005, results20_01],
