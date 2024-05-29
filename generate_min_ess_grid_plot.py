@@ -4,18 +4,27 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 
 # Load data
+# B = 10
 with open("results/experiment1234_final_T10_step005.pkl", "rb") as file:
     results10_005 = pickle.load(file)
 
 with open("results/experiment1234_final_T10_step01.pkl", "rb") as file:
     results10_01 = pickle.load(file)
 
+with open("results/experiment1234_final_T10_step05.pkl", "rb") as file:
+    results10_05 = pickle.load(file)
+
+# B = 20
 with open("results/experiment1234_final_T20_step005.pkl", "rb") as file:
     results20_005 = pickle.load(file)
 
 with open("results/experiment1234_final_T20_step01.pkl", "rb") as file:
     results20_01 = pickle.load(file)
 
+with open("results/experiment1234_final_T20_step05.pkl", "rb") as file:
+    results20_05 = pickle.load(file)
+
+# B = 30
 with open("results/experiment1234_final_T30_step005.pkl", "rb") as file:
     results30_005 = pickle.load(file)
 
@@ -26,9 +35,9 @@ with open("results/experiment1234_final_T30_step05.pkl", "rb") as file:
     results30_05 = pickle.load(file)
 
 results = {
-    '10': [results10_005, results10_01],
-    '20': [results20_005, results20_01],
-    '30': [results30_005, results30_01]
+    '10': [results10_005, results10_01, results10_05],
+    '20': [results20_005, results20_01, results20_05],
+    '30': [results30_005, results30_01, results30_05]
 }
 
 sigmas = np.logspace(start=0.0, stop=-5.0, num=6, endpoint=True, base=10.0, dtype=np.float64)
@@ -36,12 +45,12 @@ cs = ['dodgerblue', 'lightcoral', 'lawngreen']
 mecs = ['navy', 'brown', 'forestgreen']
 algs = ['thug', 'hmc', 'crwm']
 Bs = [10, 20, 30]
-steps = [0.05, 0.1]
+steps = [0.05, 0.1, 0.5]
 
 rc('font', **{'family': 'STIXGeneral'})
-fig, ax = plt.subplots(figsize=(12, 8), nrows=2, ncols=3, sharex=True, sharey=True)
+fig, ax = plt.subplots(figsize=(12, 10), nrows=3, ncols=3, sharex=True, sharey=True)
 
-for ri in range(2):      # row index (for step sizes)
+for ri in range(3):      # row index (for step sizes)
     for ci in range(3):  # col index (for number of integration steps)
         for ai, alg in enumerate(algs):
             ax[ri, ci].plot(sigmas, results[str(10*(ci+1))][ri]['cc-az'][alg],
