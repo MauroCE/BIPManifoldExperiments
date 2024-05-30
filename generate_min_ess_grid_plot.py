@@ -68,7 +68,7 @@ for ci in range(3):
     ax[-1, ci].set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
 plt.legend()
 plt.tight_layout()
-plt.savefig("images/min_ess_vs_noise_scale_grid.png", dpi=300)
+# plt.savefig("images/min_ess_vs_noise_scale_grid.png", dpi=300)
 plt.show()
 
 # Generate a single plot for B=20 and step=0.1 which will be used in the main part of the thesis
@@ -87,7 +87,7 @@ ax.set_ylabel("minESS/s", fontsize=16)
 ax.set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
 plt.legend()
 plt.tight_layout()
-plt.savefig("images/min_ess_vs_noise_scale_main.png", dpi=300)
+# plt.savefig("images/min_ess_vs_noise_scale_main.png", dpi=300)
 plt.show()
 
 # Generate raw minESS plot for main part of the thesis
@@ -106,5 +106,32 @@ ax.set_ylabel("minESS", fontsize=16)
 ax.set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
 plt.legend()
 plt.tight_layout()
-plt.savefig("images/raw_min_ess_main.png", dpi=300)
+# plt.savefig("images/raw_min_ess_main.png", dpi=300)
+plt.show()
+
+
+# Join image
+rc('font', **{'family': 'STIXGeneral'})
+fig, ax = plt.subplots(figsize=(8, 4), ncols=2)
+for ai, alg in enumerate(algs):
+    ax[0].plot(sigmas, results['20'][1]['cc-az'][alg], marker='o', lw=2.5, ms=9.0, c=cs[ai], mec=mecs[ai],
+               label=alg.upper(), mew=2.0)
+    ax[1].plot(sigmas, results['20'][1]['ess-az'][alg], marker='o', lw=2.5, ms=9.0, c=cs[ai], mec=mecs[ai],
+               label=alg.upper(), mew=2.0)
+ax[0].plot(sigmas[:4], results['20'][1]['cc-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
+           label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
+ax[1].plot(sigmas[:4], results['20'][1]['ess-az']['hmc-p'][:4], marker='o', lw=2.5, ms=9.0, c='gold', mec='goldenrod',
+           label='HMC' + r" $\mathregular{\delta\propto\sigma}$", mew=2.0)
+for i in range(2):
+    ax[i].set_xscale('log')
+    ax[i].set_yscale('log')
+    ax[i].grid(True, color='gainsboro')
+    ax[i].set_xlabel("Noise scale" + r" $\mathregular{\sigma}$", fontsize=16)
+
+# Prettify
+ax[0].set_ylabel("minESS/s", fontsize=16)
+ax[1].set_ylabel("minESS", fontsize=16)
+plt.legend()
+plt.tight_layout()
+plt.savefig("images/comp_cost_vs_noise_scale_and_raw_min_ess_main.png", dpi=400)
 plt.show()
